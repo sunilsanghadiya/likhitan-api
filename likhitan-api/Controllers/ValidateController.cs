@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using likhitan.Common.Services;
+using likhitan.Models;
+using likhitan_api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace likhitan.Controllers
 {
     [Route("api/validate")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Cookies")]
+    [Authorize]
     public class ValidateController : ControllerBase
     {
         public IConfiguration Configuration { get; set; }
@@ -15,8 +18,15 @@ namespace likhitan.Controllers
             Configuration = configuration;
         }
 
-        [HttpGet("check-auth")]
-        public IActionResult CheckAuth() => Ok(true);
+        [HttpGet("checkAuth")]
+        public Result<CheckAuthResponse> CheckAuth()
+        {
+            CheckAuthResponse response = new()
+            {
+                IsAuthenticated = true,
+            };
+            return Result<CheckAuthResponse>.Success(response);
+        }
 
     }
 }
