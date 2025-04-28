@@ -31,8 +31,8 @@ namespace likhitan.Middlewares
                 "/api/auth/forgotpassword",
                 "/api/auth/refreshToken",
                 "/api/auth/RegisterWithOAuth",
-                "api/validate/isUserAuthenticated"
-
+                "api/validate/isUserAuthenticated",
+                "/api/auth/IsEmailDomainSupport",
             };
 
             if (publicRoutes.Contains<string>(path))

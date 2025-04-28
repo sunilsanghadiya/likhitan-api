@@ -18,5 +18,7 @@ namespace likhitan.Controllers
         //public async Task<Results<AuthorResponse>> GetAuthorById(int id) =>
         //    await _authorService.GetAuthorById(id);
 
+        //public async Task<Results<BecomeAuthorResponse>>
+
     }
 }

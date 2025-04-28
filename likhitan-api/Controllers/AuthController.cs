@@ -2,6 +2,8 @@
 using likhitan.Models;
 using likhitan.Models.ClientDto;
 using likhitan.Services;
+using likhitan_api.Models;
+using likhitan_api.Models.ClientDto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -46,9 +48,13 @@ namespace likhitan.Controllers
         public async Task<Result<RegisterWithOAuthResponse>> RegisterWithOAuth(RegisterWithOAuthDto registerWithOAuthDto) =>
             await _authService.RegisterWithOAuth(registerWithOAuthDto);
 
-        [HttpPost("Logout")]
-        public async Task<Result<LogoutResponse>> Logout(LogoutDto logoutDto) =>
-            await _authService.Logout(logoutDto);
+        [HttpGet("Logout")]
+        public async Task<Result<LogoutResponse>> Logout() =>
+            await _authService.Logout(Request, Response);
+
+        [HttpPost("IsEmailDomainSupport")]
+        public async Task<Result<IsEmailDomainSupportResponse>> IsEmailDomainSupport(IsEmailDomainSupportDto obj) =>
+            await _authService.IsEmailDomainSupport(obj);
 
     }
 }

@@ -4,6 +4,7 @@ using likhitan.Db;
 using likhitan.Middlewares;
 using likhitan.Repository;
 using likhitan.Services;
+using likhitan_api.Common.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
@@ -44,7 +45,7 @@ namespace likhitan
             services.AddMemoryCache();
 
             services.AddHttpContextAccessor();
-            services.AddHttpClient();
+            services.AddHttpClient<IDisposableEmailChecker, DisposableEmailChecker>();
 
             services.AddAuthentication(
                 options =>

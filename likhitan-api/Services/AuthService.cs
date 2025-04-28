@@ -7,11 +7,15 @@ using likhitan.Entities;
 using likhitan.Models;
 using likhitan.Models.ClientDto;
 using likhitan.Repository;
+using likhitan_api.Common.Services;
+using likhitan_api.Models;
+using likhitan_api.Models.ClientDto;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace likhitan.Services
 {
@@ -24,7 +28,8 @@ namespace likhitan.Services
         Task<Result<RefreshTokenResponse>> RefreshToken(HttpRequest request, HttpResponse response);
         Task<Result<ForgotPasswordResponse>> ForgotPassword(ForgotPasswordDto forgotPasswordDto);
         Task<Result<RegisterWithOAuthResponse>> RegisterWithOAuth(RegisterWithOAuthDto registerWithOAuthDto);
-        Task<Result<LogoutResponse>> Logout(LogoutDto logoutDto);
+        Task<Result<LogoutResponse>> Logout(HttpRequest request, HttpResponse httpResponse);
+        Task<Result<IsEmailDomainSupportResponse>> IsEmailDomainSupport(IsEmailDomainSupportDto obj);
     }
     public class AuthService : IAuthService
     {
@@ -38,6 +43,7 @@ namespace likhitan.Services
         public IUserTrackingService _userTrackingService;
         public RedisService _redisService;
         public IWebHostEnvironment _env;
+        private readonly IDisposableEmailChecker _emailChecker;
 
         public AuthService(
             IAuthRepository authRepository,
@@ -49,7 +55,8 @@ namespace likhitan.Services
             JwtHelperService jwtHelperService,
             IUserTrackingService userTrackingService,
             RedisService redisService,
-            IWebHostEnvironment env
+            IWebHostEnvironment env,
+            IDisposableEmailChecker disposableEmailChecker
             )
         {
             _authRepository = authRepository;
@@ -62,6 +69,7 @@ namespace likhitan.Services
             _userTrackingService = userTrackingService;
             _redisService = redisService;
             _env = env;
+            _emailChecker = disposableEmailChecker;
         }
 
         public async Task<Result<LoginResponse>> Login(LoginDto loginDto)
@@ -135,6 +143,8 @@ namespace likhitan.Services
                 return Result<RegisterResponse>.BadRequest("Provide at least one upper case and one lower case and one numeric and one special character and passoword should not start with your name.");
             if (registerDto.Password.Length > 512 || registerDto.ConfirmPassword.Length > 512)
                 return Result<RegisterResponse>.BadRequest("Password should not be more then 512 character");
+            if(await _emailChecker.IsDisposableEmail(registerDto.Email))
+                return Result<RegisterResponse>.BadRequest("Provided email domain not supported please try different");
             #endregion
 
             var generateOtp = Helper.GenerateOTP();
@@ -347,37 +357,58 @@ namespace likhitan.Services
             return Result<RegisterWithOAuthResponse>.Success(registerWithOAuthResponse);
         }
 
-        public async Task<Result<LogoutResponse>> Logout(LogoutDto logoutDto)
+        public async Task<Result<LogoutResponse>> Logout(HttpRequest request, HttpResponse httpResponse)
         {
-            return await Task.Run(async () =>
+            return await Task.Run(() =>
             {
-                #region API Validations
-                if (string.IsNullOrWhiteSpace(logoutDto.AccessToken))
-                    return Result<LogoutResponse>.BadRequest("Please provide access token");
-                if (string.IsNullOrWhiteSpace(logoutDto.RefreshToken))
-                    return Result<LogoutResponse>.BadRequest("Please provide refresh token");
-                #endregion
+                if (httpResponse == null)
+                    return Result<LogoutResponse>.BadRequest("HttpResponse is unavailable.");
+                if (request == null)
+                    return Result<LogoutResponse>.BadRequest("HttpRequest is unavailable.");
 
-                var httpContext = _httpContextAccessor.HttpContext;
-                if (httpContext == null)
-                    return Result<LogoutResponse>.BadRequest("HttpContext is unavailable.");
+                httpResponse.Cookies.Delete("AccessToken", new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, 
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.Now.AddDays(-1) 
+                });
 
-                httpContext.Response.Cookies.Delete("AccessToken");
-                httpContext.Response.Cookies.Delete("RefreshToken");
-
-                var hasAccessToken = httpContext.Request.Cookies.TryGetValue("AccessToken", out _);
-                var hasRefreshToken = httpContext.Request.Cookies.TryGetValue("RefreshToken", out _);
-
-                await _redisService.DeleteKeyAsync($"UserId_ ${logoutDto.UserId}");
-                await _redisService.DeleteKeyAsync(logoutDto.UserId.ToString());
+                httpResponse.Cookies.Delete("RefreshToken", new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.Now.AddDays(-1)
+                });
 
                 LogoutResponse logoutResponse = new()
                 {
-                    IsLogout = !hasAccessToken && !hasRefreshToken
+                    IsLogout = true
                 };
 
                 return Result<LogoutResponse>.Success(logoutResponse);
             });
+        }
+
+        public async Task<Result<IsEmailDomainSupportResponse>> IsEmailDomainSupport(IsEmailDomainSupportDto obj)
+        {
+            #region API VALIDATIONS
+            if (string.IsNullOrEmpty(obj.Email))
+                return Result<IsEmailDomainSupportResponse>.BadRequest("Please provide email address");
+            #endregion
+
+            IsEmailDomainSupportResponse response = new();
+
+            if (await _emailChecker.IsDisposableEmail(obj.Email))
+            {
+                response.IsEmailSupport = false;
+                return Result<IsEmailDomainSupportResponse>.Success(response);
+            }
+
+            response = new() { IsEmailSupport = true };
+
+            return Result<IsEmailDomainSupportResponse>.Success(response);
         }
 
 
