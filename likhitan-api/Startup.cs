@@ -113,22 +113,16 @@ namespace likhitan
                         OnMessageReceived = context =>
                         {
                             var token = context.Request.Cookies["AccessToken"]; // Read JWT from HttpOnly cookie
+                            //var refreshToken = context.Request.Cookies["RefreshToken"]; // Read JWT from HttpOnly cookie
                             if (!string.IsNullOrEmpty(token))
                             {
                                 context.Token = token;
+                                //context.Token = refreshToken;
                             }
                             return Task.CompletedTask;
                         }
                     };
                 });
-                //.AddCookie("CookieAuth", options =>
-                //{
-                //    options.Cookie.Name = "AccessToken";
-                //    options.Cookie.HttpOnly = true;
-                //    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;  
-                //    //options.Cookie.SameSite = SameSiteMode.None;            
-                //    options.LoginPath = "/api/auth/login";
-                //});
             #endregion
 
             #region Rate Limit

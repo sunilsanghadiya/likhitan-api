@@ -1,7 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using likhitan.Common.Enums;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 namespace likhitan.Common.Services
 {
@@ -33,13 +35,14 @@ namespace likhitan.Common.Services
             return claimsPrincipal?.Claims.FirstOrDefault(c => c.Type == claimType)?.Value;
         }
 
-        public string GenerateJwtToken(string username)
+        public string GenerateJwtToken(string username, string role)
         {
             var key = Encoding.UTF8.GetBytes(_configuration.GetValue<string>("Jwt:key"));
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, username),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString().Replace("-", ""))
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString().Replace("-", "")),
+                new Claim(ClaimTypes.Role, role)
             };
 
             var token = new JwtSecurityToken(
@@ -85,12 +88,13 @@ namespace likhitan.Common.Services
             return null;
         }
 
-        public string GenerateRefreshToken(string username, TimeSpan expiry, string secretKey)
+        public string GenerateRefreshToken(string username, TimeSpan expiry, string secretKey, string role)
         {
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, username),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString().Replace("-", ""))
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString().Replace("-", "")),
+                new Claim(ClaimTypes.Role, role)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));

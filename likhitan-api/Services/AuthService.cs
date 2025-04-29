@@ -96,8 +96,12 @@ namespace likhitan.Services
                 loginResponse.IsUserVerified = result.IsUserVerified;
                 loginResponse.RoleId = result.RoleId;
                 loginResponse.IsActive = result.IsActive;
-                loginResponse.AccessToken = _jwtHelperService.GenerateJwtToken(result.Email);
-                loginResponse.RefreshToken = _jwtHelperService.GenerateRefreshToken(result.Email, TimeSpan.FromMinutes(_configuration.GetValue<int>("Jwt:RefreshExpiresInMinutes")), _configuration.GetValue<string>("Jwt:RefreshKey") ?? "");
+                loginResponse.AccessToken = _jwtHelperService.GenerateJwtToken(result.Email, result.RoleId.ToString());
+                loginResponse.RefreshToken = _jwtHelperService.GenerateRefreshToken(
+                    result.Email, 
+                    TimeSpan.FromMinutes(_configuration.GetValue<int>("Jwt:RefreshExpiresInMinutes")), 
+                    _configuration.GetValue<string>("Jwt:RefreshKey") ?? "",
+                    result.RoleId.ToString());
                 SetCookies(loginResponse.AccessToken, loginResponse.RefreshToken);
                 await _redisService.SetValueAsync(loginResponse.Id.ToString(), loginResponse.AccessToken);
             }
@@ -174,8 +178,12 @@ namespace likhitan.Services
 
             if(data.IsActive && data.IsUserVerified && !data.IsDeleted && data.IsTeamsAndConditionAccepted)
             {
-                data.AccessToken = _jwtHelperService.GenerateJwtToken(data.Email);
-                data.RefreshToken = _jwtHelperService.GenerateRefreshToken(data.Email, TimeSpan.FromMinutes(_configuration.GetValue<int>("Jwt:RefreshExpiresInMinutes")), _configuration.GetValue<string>("Jwt:RefreshKey") ?? "");
+                data.AccessToken = _jwtHelperService.GenerateJwtToken(data.Email, data.RoleId.ToString());
+                data.RefreshToken = _jwtHelperService.GenerateRefreshToken(
+                    data.Email, 
+                    TimeSpan.FromMinutes(_configuration.GetValue<int>("Jwt:RefreshExpiresInMinutes")), 
+                    _configuration.GetValue<string>("Jwt:RefreshKey") ?? "",
+                    data.RoleId.ToString());
                 await _redisService.SetValueAsync($"UserId_ ${data.Id}", $"_AccessToken_${data.AccessToken}_RefreshToken_${data.RefreshToken}");
             }
 
@@ -199,8 +207,12 @@ namespace likhitan.Services
                 if(sendOtpDto.OTP == userDetail.Data.OTP && !Helper.IsOtpExpired(userDetail.Data.OTPExpire))
                 {
                     res.IsOtpSend = true;
-                    var token = _jwtHelperService.GenerateJwtToken(userDetail.Data.Email);
-                    var refreshToken = _jwtHelperService.GenerateRefreshToken(userDetail.Data.Email, TimeSpan.FromMinutes(_configuration.GetValue<int>("Jwt:RefreshExpiresInMinutes")), _configuration.GetValue<string>("Jwt:RefreshKey") ?? "");
+                    var token = _jwtHelperService.GenerateJwtToken(userDetail.Data.Email, userDetail.Data.RoleId.ToString());
+                    var refreshToken = _jwtHelperService.GenerateRefreshToken(
+                        userDetail.Data.Email, 
+                        TimeSpan.FromMinutes(_configuration.GetValue<int>("Jwt:RefreshExpiresInMinutes")), 
+                        _configuration.GetValue<string>("Jwt:RefreshKey") ?? "",
+                        userDetail.Data.RoleId.ToString());
                     res.AccessToken = token;
                     res.RefreshToken = refreshToken;
                     SetCookies(token, refreshToken);
@@ -244,6 +256,7 @@ namespace likhitan.Services
                 return Result<RefreshTokenResponse>.Unauthorized("Invalid token");
 
             var email = validated.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
+            var roleId = validated.Claims.FirstOrDefault(r => r.Type == ClaimTypes.Role)?.Value;
             if (string.IsNullOrEmpty(email))
                 return Result<RefreshTokenResponse>.Unauthorized("Invalid token payload");
 
@@ -251,11 +264,11 @@ namespace likhitan.Services
             if (user.Data == null)
                 return Result<RefreshTokenResponse>.NotFound("User not found");
 
-            var accessToken = _jwtHelperService.GenerateJwtToken(email);
+            var accessToken = _jwtHelperService.GenerateJwtToken(email, roleId);
             var newRefreshToken = _jwtHelperService.GenerateRefreshToken(
                 email,
                 TimeSpan.FromMinutes(_configuration.GetValue<int>("Jwt:RefreshExpiresInMinutes")),
-                _configuration["Jwt:RefreshKey"] ?? "");
+                _configuration["Jwt:RefreshKey"] ?? "", roleId);
 
             SetCookies(accessToken, newRefreshToken);
 
@@ -296,7 +309,7 @@ namespace likhitan.Services
             {
                 Id = updatedUser.Data.Id,
                 Email = updatedUser.Data.Email,
-                AccessToken = _jwtHelperService.GenerateJwtToken(updatedUser.Data.Email)
+                AccessToken = _jwtHelperService.GenerateJwtToken(updatedUser.Data.Email, updatedUser.Data.RoleId.ToString())
             };
 
             string forwardedIp = _httpContextAccessor.HttpContext.Request.Headers["X-Forwarded-For"];
