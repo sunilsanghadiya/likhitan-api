@@ -2,6 +2,7 @@
 using likhitan.Entities;
 using likhitan.Models;
 using likhitan.Models.ClientDto;
+using likhitan_api.Models;
 
 namespace likhitan
 {
@@ -16,6 +17,7 @@ namespace likhitan
             CreateMap<UserTracking, UserTrackingResponse>();
             CreateMap<UserTrackingDto, UserTracking>();
             CreateMap<UserResponse, User>();
+            CreateMap<Author, AuthorResponse>();
         }
     }
 }

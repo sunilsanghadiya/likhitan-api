@@ -11,6 +11,7 @@ namespace likhitan.Repository
         Task<User?> GetUserById(int id);
         Task<List<string>?> GetUserByEmailId(string email);
         Task<User?> GetSimpleUserById(int id);
+        Task<User?> GetUserDetailByEmailId(string email);
     }
     public class UserRepository : IUserRepository
     {
@@ -40,6 +41,13 @@ namespace likhitan.Repository
                 OTPExpire = v.OTPExpire, 
                 Id = v.Id, 
                 Email = v.Email
+            }).FirstOrDefaultAsync();
+
+        public async Task<User?> GetUserDetailByEmailId(string email) =>
+            await _context.Users.Where(a => a.Email == email).Select(u => new User 
+            { 
+                Id = u.Id,
+                Name = u.Name,
             }).FirstOrDefaultAsync();
 
         public async Task<List<string>?> GetUserByEmailId(string email) =>

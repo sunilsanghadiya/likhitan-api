@@ -1,4 +1,7 @@
-﻿using likhitan.Services;
+﻿using likhitan.Common.Services;
+using likhitan.Services;
+using likhitan_api.Models;
+using likhitan_api.Models.ClientDto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,10 +18,13 @@ namespace likhitan.Controllers
             _authorService = authorService;
         }
 
-        //public async Task<Results<AuthorResponse>> GetAuthorById(int id) =>
-        //    await _authorService.GetAuthorById(id);
+        [HttpGet("GetAuthorById")]
+        public async Task<Result<AuthorResponse>> GetAuthorById(int id) =>
+            await _authorService.GetAuthorById(id);
 
-        //public async Task<Results<BecomeAuthorResponse>>
+        [HttpPost("BecomeAuthor")]
+        public async Task<Result<BecomeAuthorResponse>> BecomeAuthor(BecomeAuthorDto becomeAuthorDto) =>
+            await _authorService.BecomeAuthor(becomeAuthorDto);
 
     }
 }

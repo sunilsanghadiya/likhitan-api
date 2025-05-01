@@ -291,6 +291,12 @@ namespace likhitan.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AddressesId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("AuthorId")
                         .HasColumnType("int");
 
@@ -358,6 +364,8 @@ namespace likhitan.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AddressesId");
 
                     b.HasIndex("AuthorId");
 
@@ -451,6 +459,37 @@ namespace likhitan.Migrations
                     b.ToTable("UserTracking");
                 });
 
+            modelBuilder.Entity("likhitan_api.Entities.Addresses", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"));
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Street")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Addresses");
+                });
+
             modelBuilder.Entity("likhitan.Entities.Blogs", b =>
                 {
                     b.HasOne("likhitan.Entities.Author", "Author")
@@ -492,6 +531,12 @@ namespace likhitan.Migrations
 
             modelBuilder.Entity("likhitan.Entities.User", b =>
                 {
+                    b.HasOne("likhitan_api.Entities.Addresses", "Addresses")
+                        .WithMany("Users")
+                        .HasForeignKey("AddressesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("likhitan.Entities.Author", null)
                         .WithMany("User")
                         .HasForeignKey("AuthorId");
@@ -513,6 +558,8 @@ namespace likhitan.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Addresses");
 
                     b.Navigation("Role");
                 });
@@ -565,6 +612,11 @@ namespace likhitan.Migrations
                 });
 
             modelBuilder.Entity("likhitan.Entities.UserRoles", b =>
+                {
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("likhitan_api.Entities.Addresses", b =>
                 {
                     b.Navigation("Users");
                 });
