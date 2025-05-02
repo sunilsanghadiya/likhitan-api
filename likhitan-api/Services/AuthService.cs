@@ -44,6 +44,7 @@ namespace likhitan.Services
         public RedisService _redisService;
         public IWebHostEnvironment _env;
         private readonly IDisposableEmailChecker _emailChecker;
+        private readonly IAuthorService _authorService;
 
         public AuthService(
             IAuthRepository authRepository,
@@ -56,7 +57,8 @@ namespace likhitan.Services
             IUserTrackingService userTrackingService,
             RedisService redisService,
             IWebHostEnvironment env,
-            IDisposableEmailChecker disposableEmailChecker
+            IDisposableEmailChecker disposableEmailChecker,
+            IAuthorService authorService
             )
         {
             _authRepository = authRepository;
@@ -70,6 +72,7 @@ namespace likhitan.Services
             _redisService = redisService;
             _env = env;
             _emailChecker = disposableEmailChecker;
+            _authorService = authorService;
         }
 
         public async Task<Result<LoginResponse>> Login(LoginDto loginDto)
@@ -87,6 +90,7 @@ namespace likhitan.Services
                 return Result<LoginResponse>.NotFound("Provided username not found");
 
             var userDetail = await _userService.GetUserByEmail(loginDto.Email);
+            var authorDetail = await _authorService.GetAuthorById(userDetail?.Data?.AuthorId ?? 0);
 
             if (Helper.VerifyPassword(loginDto.Password, userDetail.Data?.PasswordHash ?? ""))
             {
@@ -96,6 +100,7 @@ namespace likhitan.Services
                 loginResponse.IsUserVerified = result.IsUserVerified;
                 loginResponse.RoleId = result.RoleId;
                 loginResponse.IsActive = result.IsActive;
+                loginResponse.AuthorId = authorDetail?.Data?.Id ?? 0;
                 loginResponse.AccessToken = _jwtHelperService.GenerateJwtToken(result.Email, result.RoleId.ToString());
                 loginResponse.RefreshToken = _jwtHelperService.GenerateRefreshToken(
                     result.Email, 

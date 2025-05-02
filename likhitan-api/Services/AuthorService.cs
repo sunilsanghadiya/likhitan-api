@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using likhitan.Common.Enums;
 using likhitan.Common.Services;
 using likhitan.Entities;
 using likhitan.Repository;
@@ -47,7 +48,7 @@ namespace likhitan.Services
                 return Result<BecomeAuthorResponse>.InternalServerError("cannot able to fetch user emailId please try again");
             }
 
-            var userDetail = await _userRepository.GetUserDetailByEmailId(loggedInUerDetail.Email);
+            var userDetail = await _userRepository.GetUserByEmail(loggedInUerDetail.Email);
 
             var author = new Author()
             {
@@ -61,6 +62,10 @@ namespace likhitan.Services
             await _authorRepository.SaveBecomeAuthor(author);
 
             var authorDetail = await GetAuthorById(author.Id);
+            
+            userDetail.AuthorId = author.Id;
+            userDetail.RoleId = (int)UserRole.Author;
+            await _userRepository.UpdateUser(userDetail);
 
             var authorResult = new BecomeAuthorResponse()
             {

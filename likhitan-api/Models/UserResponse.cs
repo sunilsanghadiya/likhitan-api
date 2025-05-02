@@ -17,5 +17,6 @@ namespace likhitan.Models
         public DateTime Created { get; set; }
         public string OTP { get; set; }
         public DateTime OTPExpire { get; set; }
+        public int AuthorId { get; set; }
     }
 }

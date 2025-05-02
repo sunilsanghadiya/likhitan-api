@@ -12,6 +12,7 @@ namespace likhitan.Repository
         Task<List<string>?> GetUserByEmailId(string email);
         Task<User?> GetSimpleUserById(int id);
         Task<User?> GetUserDetailByEmailId(string email);
+        Task UpdateUser(User user);
     }
     public class UserRepository : IUserRepository
     {
@@ -26,6 +27,15 @@ namespace likhitan.Repository
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return user;
+        }
+
+        public async Task UpdateUser(User user)
+        {
+            if(user.Id > 0)
+            {
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<User?> GetUserByEmail(string email) =>
