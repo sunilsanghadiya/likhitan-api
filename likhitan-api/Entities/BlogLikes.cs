@@ -3,7 +3,7 @@
     public class BlogLikes
     {
         public int Id { get; set; }
-        public Guid BlogId { get; set; }
+        public int BlogId { get; set; }
         public int UserId { get; set; }
         public ICollection<User> User { get; set; }
         public ICollection<Blogs> Blog { get; set; }

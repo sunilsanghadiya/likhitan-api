@@ -21,8 +21,8 @@
         public int Gender { get; set; }
         public DateTime? DOB { get; set; }
         public int? AuthorId { get; set; }
-        //public int? BlogCommentsId { get; set; }
+        public int? BlogCommentsId { get; set; }
         public int? BlogLikesId { get; set; }
-        //public int? BlogViewsId { get; set; }
+        public int? BlogViewsId { get; set; }
     }
 }

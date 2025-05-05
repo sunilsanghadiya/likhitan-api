@@ -5,6 +5,8 @@ using likhitan.Middlewares;
 using likhitan.Repository;
 using likhitan.Services;
 using likhitan_api.Common.Services;
+using likhitan_api.Repository;
+using likhitan_api.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
@@ -179,6 +181,7 @@ namespace likhitan
             services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             services.AddScoped<IUserTrackingRepository, UserTrackingRepository>();
             services.AddScoped<IAuthorRepository, AuthorRepository>();
+            services.AddScoped<IBlogRepository, BlogRepository>();
             #endregion
 
             #region Business Logic Services
@@ -188,7 +191,7 @@ namespace likhitan
             services.AddScoped<IProfileService, ProfileService>();
             services.AddScoped<IUserTrackingService, UserTrackingService>();
             services.AddScoped<IAuthorService, AuthorService>();
-
+            services.AddScoped<IBlogService, BlogService>();
             #endregion
         }
 
