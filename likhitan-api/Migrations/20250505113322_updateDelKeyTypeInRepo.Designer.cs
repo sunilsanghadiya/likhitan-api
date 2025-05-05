@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using likhitan.Db;
 
@@ -11,9 +12,11 @@ using likhitan.Db;
 namespace likhitan.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250505113322_updateDelKeyTypeInRepo")]
+    partial class updateDelKeyTypeInRepo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -195,7 +198,7 @@ namespace likhitan.Migrations
                     b.Property<int>("AuthorId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("BlogCategoryId")
+                    b.Property<int>("BlogCategoryId")
                         .HasColumnType("int");
 
                     b.Property<int?>("BlogCommentsId")
@@ -207,7 +210,7 @@ namespace likhitan.Migrations
                     b.Property<int?>("BlogViewsId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CategoryId")
+                    b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
@@ -229,10 +232,10 @@ namespace likhitan.Migrations
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TagId")
+                    b.Property<int>("TagId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TagsId")
+                    b.Property<int>("TagsId")
                         .HasColumnType("int");
 
                     b.Property<string>("ThumbnailUrl")
@@ -467,7 +470,9 @@ namespace likhitan.Migrations
 
                     b.HasOne("likhitan.Entities.BlogCategory", "BlogCategory")
                         .WithMany()
-                        .HasForeignKey("BlogCategoryId");
+                        .HasForeignKey("BlogCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("likhitan.Entities.BlogComments", null)
                         .WithMany("Blogs")
@@ -483,7 +488,9 @@ namespace likhitan.Migrations
 
                     b.HasOne("likhitan.Entities.Tags", "Tags")
                         .WithMany("Blogs")
-                        .HasForeignKey("TagsId");
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Author");
 

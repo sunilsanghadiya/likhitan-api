@@ -9,7 +9,7 @@
         public ICollection<Blogs> Blog { get; set; }
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; } = false;
-        public DateTime Deleted { get; set; }
+        public DateTime? Deleted { get; set; }
         public DateTime Created { get; set; }
     }
 }

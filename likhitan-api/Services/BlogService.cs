@@ -30,19 +30,22 @@ namespace likhitan_api.Services
                 return Result<WriteBlogResponse>.BadRequest("please provide content");
             }
 
-            var blogs = new Blogs()
+            var blog = new Blogs()
             {
                 Id = 0,
                 Title = writeBlogDto.Title,
                 Content = writeBlogDto.Content,
-
+                IsDeleted = false,
+                Created = DateTime.UtcNow,
+                AuthorId = writeBlogDto?.AuthorId ?? 0,
             };
+            await _blogRepository.SaveBlog(blog);
 
-            var writedBlog = await _blogRepository.IsBlogExists(blogs.Id);
+            var writedBlog = await _blogRepository.IsBlogExists(blog.Id);
 
             WriteBlogResponse writeBlogResponse = new()
             {
-                IsBlogPosted = writedBlog ? true : false,
+                IsBlogPosted = writedBlog,
             };
 
             return Result<WriteBlogResponse>.Success(writeBlogResponse);
