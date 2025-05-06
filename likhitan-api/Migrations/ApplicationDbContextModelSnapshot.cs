@@ -30,7 +30,7 @@ namespace likhitan.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("Created")
+                    b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("Deleted")
@@ -51,7 +51,7 @@ namespace likhitan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Author");
+                    b.ToTable("Author", (string)null);
                 });
 
             modelBuilder.Entity("likhitan.Entities.BlogCategory", b =>
@@ -62,7 +62,7 @@ namespace likhitan.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("Deleted")
+                    b.Property<DateTime>("Deleted")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
@@ -77,7 +77,7 @@ namespace likhitan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BlogCategories");
+                    b.ToTable("BlogCategories", (string)null);
                 });
 
             modelBuilder.Entity("likhitan.Entities.BlogComments", b =>
@@ -115,7 +115,7 @@ namespace likhitan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BlogComments");
+                    b.ToTable("BlogComments", (string)null);
                 });
 
             modelBuilder.Entity("likhitan.Entities.BlogLikes", b =>
@@ -132,7 +132,7 @@ namespace likhitan.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("Deleted")
+                    b.Property<DateTime>("Deleted")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
@@ -146,7 +146,7 @@ namespace likhitan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BlogLikes");
+                    b.ToTable("BlogLikes", (string)null);
                 });
 
             modelBuilder.Entity("likhitan.Entities.BlogViews", b =>
@@ -160,7 +160,7 @@ namespace likhitan.Migrations
                     b.Property<int>("BlogId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Deleted")
+                    b.Property<DateTime>("Deleted")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("IpAddress")
@@ -181,7 +181,7 @@ namespace likhitan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BlogViews");
+                    b.ToTable("BlogViews", (string)null);
                 });
 
             modelBuilder.Entity("likhitan.Entities.Blogs", b =>
@@ -195,7 +195,7 @@ namespace likhitan.Migrations
                     b.Property<int>("AuthorId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("BlogCategoryId")
+                    b.Property<int>("BlogCategoryId")
                         .HasColumnType("int");
 
                     b.Property<int?>("BlogCommentsId")
@@ -207,7 +207,7 @@ namespace likhitan.Migrations
                     b.Property<int?>("BlogViewsId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CategoryId")
+                    b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
@@ -229,10 +229,10 @@ namespace likhitan.Migrations
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TagId")
+                    b.Property<int>("TagId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TagsId")
+                    b.Property<int>("TagsId")
                         .HasColumnType("int");
 
                     b.Property<string>("ThumbnailUrl")
@@ -259,7 +259,7 @@ namespace likhitan.Migrations
 
                     b.HasIndex("TagsId");
 
-                    b.ToTable("Blogs");
+                    b.ToTable("Blogs", (string)null);
                 });
 
             modelBuilder.Entity("likhitan.Entities.Tags", b =>
@@ -270,7 +270,7 @@ namespace likhitan.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("Deleted")
+                    b.Property<DateTime>("Deleted")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("IsActive")
@@ -286,7 +286,7 @@ namespace likhitan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags");
+                    b.ToTable("Tags", (string)null);
                 });
 
             modelBuilder.Entity("likhitan.Entities.User", b =>
@@ -375,7 +375,7 @@ namespace likhitan.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("likhitan.Entities.UserRoles", b =>
@@ -395,7 +395,7 @@ namespace likhitan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserRoles");
+                    b.ToTable("UserRoles", (string)null);
 
                     b.HasData(
                         new
@@ -454,7 +454,7 @@ namespace likhitan.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserTracking");
+                    b.ToTable("UserTracking", (string)null);
                 });
 
             modelBuilder.Entity("likhitan.Entities.Blogs", b =>
@@ -467,7 +467,9 @@ namespace likhitan.Migrations
 
                     b.HasOne("likhitan.Entities.BlogCategory", "BlogCategory")
                         .WithMany()
-                        .HasForeignKey("BlogCategoryId");
+                        .HasForeignKey("BlogCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("likhitan.Entities.BlogComments", null)
                         .WithMany("Blogs")
@@ -483,7 +485,9 @@ namespace likhitan.Migrations
 
                     b.HasOne("likhitan.Entities.Tags", "Tags")
                         .WithMany("Blogs")
-                        .HasForeignKey("TagsId");
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Author");
 

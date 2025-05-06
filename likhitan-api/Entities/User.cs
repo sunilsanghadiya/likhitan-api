@@ -1,7 +1,10 @@
-﻿namespace likhitan.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace likhitan.Entities
 {
     public class User
     {
+        [Key]
         public int Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
@@ -21,8 +24,8 @@
         public int Gender { get; set; }
         public DateTime? DOB { get; set; }
         public int? AuthorId { get; set; }
-        public int? BlogCommentsId { get; set; }
-        public int? BlogLikesId { get; set; }
-        public int? BlogViewsId { get; set; }
+        public virtual ICollection<BlogLikes> BlogLikes { get; set; } = [];
+        public virtual ICollection<BlogComments> BlogComments { get; set; } = [];
+        public virtual ICollection<BlogViews> BlogViews { get; set; } = [];
     }
 }

@@ -1,7 +1,10 @@
-﻿namespace likhitan.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace likhitan.Entities
 {
     public class Blogs
     {
+        [Key]
         public int Id { get; set; }
         public string Title { get; set; }
         public string? Slug { get; set; }
