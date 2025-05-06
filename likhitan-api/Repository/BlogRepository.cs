@@ -31,7 +31,7 @@ namespace likhitan_api.Repository
         {
             if(blog.Id > 0)
             {
-                _context.Add(blog);
+                _context.Update(blog);
                 await _context.SaveChangesAsync();
             }
         }
