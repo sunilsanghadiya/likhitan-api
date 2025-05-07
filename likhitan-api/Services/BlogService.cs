@@ -1,4 +1,5 @@
-﻿using likhitan.Common.Services;
+﻿using AutoMapper;
+using likhitan.Common.Services;
 using likhitan.Entities;
 using likhitan_api.Models;
 using likhitan_api.Models.ClientDto;
@@ -9,14 +10,19 @@ namespace likhitan_api.Services
     public interface IBlogService
     {
         Task<Result<WriteBlogResponse>> WriteBlog(WriteBlogDto writeBlogDto);
+        Task<Result<IEnumerable<BlogsResponse>>> GetBlogs(GetBlogsDto getBlogsDto);
     }
     public class BlogService : IBlogService
     {
         private readonly IBlogRepository _blogRepository;
+        private readonly JwtHelperService _jwtHelperService;
+        private IMapper _mapper;
 
-        public BlogService(IBlogRepository blogRepository)
+        public BlogService(IBlogRepository blogRepository, JwtHelperService jwtHelperService, IMapper mapper)
         {
             _blogRepository = blogRepository;
+            _jwtHelperService = jwtHelperService;
+            _mapper = mapper;
         }
 
         public async Task<Result<WriteBlogResponse>> WriteBlog(WriteBlogDto writeBlogDto)
@@ -49,6 +55,15 @@ namespace likhitan_api.Services
             };
 
             return Result<WriteBlogResponse>.Success(writeBlogResponse);
+        }
+
+        public async Task<Result<IEnumerable<BlogsResponse>>> GetBlogs(GetBlogsDto getBlogsDto)
+        {
+            var loggedInUserDetails = _jwtHelperService.GetLoggedInUserDetails();
+
+            var blogs = _blogRepository.GetBlogs(getBlogsDto);
+
+            return Result<IEnumerable<BlogsResponse>>.Success(blogs);
         }
     }
 }
