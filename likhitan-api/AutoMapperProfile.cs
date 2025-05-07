@@ -18,6 +18,8 @@ namespace likhitan
             CreateMap<UserTrackingDto, UserTracking>();
             CreateMap<UserResponse, User>();
             CreateMap<Author, AuthorResponse>();
+            CreateMap<User, WholeUserResponse>();
+            CreateMap<WholeUserResponse, User>();
         }
     }
 }

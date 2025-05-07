@@ -30,6 +30,7 @@ namespace likhitan.Services
         Task<Result<RegisterWithOAuthResponse>> RegisterWithOAuth(RegisterWithOAuthDto registerWithOAuthDto);
         Task<Result<LogoutResponse>> Logout(HttpRequest request, HttpResponse httpResponse);
         Task<Result<IsEmailDomainSupportResponse>> IsEmailDomainSupport(IsEmailDomainSupportDto obj);
+        Task<Result<GetOTPResponse>> GetOTP(GetOTPDto getOTPDto);
     }
     public class AuthService : IAuthService
     {
@@ -169,7 +170,7 @@ namespace likhitan.Services
                 IsUserVerified = false,
                 IsActive = false,
                 OTP = generateOtp,
-                OTPExpire = DateTime.UtcNow.AddMinutes(_configuration.GetValue<double>("OTP:Expiration")),
+                OTPExpire = DateTime.UtcNow.AddMinutes(1),
                 RoleId = (int)UserRole.Standard,
                 Created = DateTime.Now,
                 IsTeamsAndConditionAccepted = registerDto.IsTeamsAndConditionAccepted,
@@ -204,13 +205,16 @@ namespace likhitan.Services
                 return Result<SendOTPResponse>.BadRequest("Please provide UserId, Bad Request");
             #endregion
 
-            var userDetail = await _userService.GetUserById(sendOtpDto.UserId);
+            var userDetail = await _userService.GetWholeUserById(sendOtpDto.UserId);
             SendOTPResponse res = new();
 
             if(userDetail != null && userDetail.Data?.OTP != null)
             {
                 if(sendOtpDto.OTP == userDetail.Data.OTP && !Helper.IsOtpExpired(userDetail.Data.OTPExpire))
                 {
+                    //var mappedUser = _mapper.Map<UserResponse, User>(userDetail.Data);
+                    //await _userService.UpdateUser(mappedUser);
+
                     res.IsOtpSend = true;
                     var token = _jwtHelperService.GenerateJwtToken(userDetail.Data.Email, userDetail.Data.RoleId.ToString());
                     var refreshToken = _jwtHelperService.GenerateRefreshToken(
@@ -429,6 +433,36 @@ namespace likhitan.Services
             return Result<IsEmailDomainSupportResponse>.Success(response);
         }
 
+        public async Task<Result<GetOTPResponse>> GetOTP(GetOTPDto getOTPDto)
+        {
+            #region API VALIDATIONS
+            if (getOTPDto.UserId <= 0)
+            {
+                return Result<GetOTPResponse>.BadRequest("Please provide userId");
+            }
+            #endregion
+
+            var userDetails = await _userService.GetWholeUserById(getOTPDto.UserId);
+            if (userDetails.Data == null)
+                return Result<GetOTPResponse>.InternalServerError("Unable to fetch user details");
+
+            userDetails.Data.OTP = Helper.GenerateOTP();
+            userDetails.Data.OTPExpire = DateTime.UtcNow.AddMinutes(_configuration.GetValue<double>("OTP:Expiration"));
+            userDetails.Data.IsActive = true;
+            userDetails.Data.IsUserVerified = true;
+            var mappedUserDetails = _mapper.Map<WholeUserResponse, User>(userDetails.Data);
+            await _userService.UpdateUser(mappedUserDetails);
+
+            var updatedUserDetails = await _userService.GetUserById(mappedUserDetails.Id);
+
+            var response = new GetOTPResponse()
+            {
+                OTP = updatedUserDetails.Data.OTP,
+                ExpiredDate = updatedUserDetails.Data.OTPExpire
+            };
+
+            return Result<GetOTPResponse>.Success(response);
+        }
 
         #region Private Methods
         private void SetCookies(string token, string refreshToken)

@@ -46,9 +46,13 @@ namespace likhitan.Common.Services
 
         public static bool IsOtpExpired(DateTime generatedTime, double expirationMinutes = 1)
         {
+            if (expirationMinutes <= 0)
+            {
+                throw new ArgumentException("Expiration minutes must be positive.");
+            }
             DateTime currentTime = DateTime.UtcNow;
             DateTime expiryTime = generatedTime.AddMinutes(expirationMinutes);
-            return currentTime > expiryTime;
+            return currentTime >= expiryTime;
         }
 
         public static bool IsPasswordFall(string password, string firstName, string lastName)

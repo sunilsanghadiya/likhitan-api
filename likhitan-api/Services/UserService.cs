@@ -3,6 +3,7 @@ using likhitan.Common.Services;
 using likhitan.Entities;
 using likhitan.Models;
 using likhitan.Repository;
+using likhitan_api.Models;
 
 namespace likhitan.Services
 {
@@ -12,6 +13,8 @@ namespace likhitan.Services
         Task<Result<UserResponse>> GetUserByEmail(string email);
         Task<Result<UserResponse>> GetUserById(int id);
         Task<Result<UserEmailExistsResponse>> GetUserByEmailId(string email);
+        Task UpdateUser(User user);
+        Task<Result<WholeUserResponse>> GetWholeUserById(int id);
     }
     public class UserService : IUserService
     {
@@ -32,7 +35,6 @@ namespace likhitan.Services
         public async Task<Result<User>> SaveUser(User user)
         {
             User newUser = await _userRepository.SaveUser(user);
-            //var data = _mapper.Map<Result<User>>(user);
             return Result<User>.Success(newUser); 
         }
 
@@ -97,6 +99,21 @@ namespace likhitan.Services
             var user = await _userRepository.GetSimpleUserById(id);
             var data = _mapper.Map<UserResponse>(user);
             return Result<UserResponse>.Success(data);
+        }
+
+        public async Task UpdateUser(User user)
+        {
+            if(user.Id > 0)
+            {
+                await _userRepository.UpdateUser(user);
+            }
+        }
+
+        public async Task<Result<WholeUserResponse>> GetWholeUserById(int id)
+        {
+            var user = await _userRepository.GetUserDetailById(id);
+            var data = _mapper.Map<WholeUserResponse>(user);
+            return Result<WholeUserResponse>.Success(data);
         }
     }
 }

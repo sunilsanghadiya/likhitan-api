@@ -56,5 +56,9 @@ namespace likhitan.Controllers
         public async Task<Result<IsEmailDomainSupportResponse>> IsEmailDomainSupport(IsEmailDomainSupportDto obj) =>
             await _authService.IsEmailDomainSupport(obj);
 
+        [HttpPost("GetOTP")]
+        public async Task<Result<GetOTPResponse>> GetOTP(GetOTPDto getOTPDto) =>
+            await _authService.GetOTP(getOTPDto);
+
     }
 }

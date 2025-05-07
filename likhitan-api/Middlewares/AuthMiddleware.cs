@@ -33,6 +33,7 @@ namespace likhitan.Middlewares
                 "/api/auth/RegisterWithOAuth",
                 "api/validate/isUserAuthenticated",
                 "/api/auth/IsEmailDomainSupport",
+                "/api/auth/GetOTP"
             };
 
             if (publicRoutes.Contains<string>(path))

@@ -1,7 +1,10 @@
-﻿namespace likhitan.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace likhitan.Entities
 {
     public class UserTracking
     {
+        [Key]
         public int Id { get; set; }
         public int UserId { get; set; }
         public DateTime LoginTime { get; set; }

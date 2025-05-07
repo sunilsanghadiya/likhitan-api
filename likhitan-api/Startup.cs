@@ -171,6 +171,8 @@ namespace likhitan
                 });
             });
 
+            services.AddHealthChecks();
+
             //services.AddHostedService<RedisCleanupService>();
             services.AddScoped<RedisService>();
             services.AddTransient<EmailService>();
@@ -219,6 +221,7 @@ namespace likhitan
             app.UseEndpoints((endpoints) =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
             });
         }
     }

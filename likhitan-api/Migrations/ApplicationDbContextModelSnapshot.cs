@@ -8,7 +8,7 @@ using likhitan.Db;
 
 #nullable disable
 
-namespace likhitan.Migrations
+namespace likhitan_api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -33,7 +33,7 @@ namespace likhitan.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("Deleted")
+                    b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
@@ -51,7 +51,7 @@ namespace likhitan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Author", (string)null);
+                    b.ToTable("Author");
                 });
 
             modelBuilder.Entity("likhitan.Entities.BlogCategory", b =>
@@ -62,7 +62,7 @@ namespace likhitan.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Deleted")
+                    b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
@@ -77,7 +77,7 @@ namespace likhitan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BlogCategories", (string)null);
+                    b.ToTable("BlogCategories");
                 });
 
             modelBuilder.Entity("likhitan.Entities.BlogComments", b =>
@@ -91,6 +91,9 @@ namespace likhitan.Migrations
                     b.Property<int>("BlogId")
                         .HasColumnType("int");
 
+                    b.Property<int>("BlogsId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Comment")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -98,7 +101,7 @@ namespace likhitan.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("Deleted")
+                    b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
@@ -115,7 +118,11 @@ namespace likhitan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BlogComments", (string)null);
+                    b.HasIndex("BlogsId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BlogComments");
                 });
 
             modelBuilder.Entity("likhitan.Entities.BlogLikes", b =>
@@ -129,10 +136,13 @@ namespace likhitan.Migrations
                     b.Property<int>("BlogId")
                         .HasColumnType("int");
 
+                    b.Property<int>("BlogsId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("Deleted")
+                    b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
@@ -146,7 +156,11 @@ namespace likhitan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BlogLikes", (string)null);
+                    b.HasIndex("BlogsId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BlogLikes");
                 });
 
             modelBuilder.Entity("likhitan.Entities.BlogViews", b =>
@@ -160,11 +174,13 @@ namespace likhitan.Migrations
                     b.Property<int>("BlogId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Deleted")
+                    b.Property<int>("BlogsId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("IpAddress")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
@@ -181,7 +197,11 @@ namespace likhitan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BlogViews", (string)null);
+                    b.HasIndex("BlogsId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BlogViews");
                 });
 
             modelBuilder.Entity("likhitan.Entities.Blogs", b =>
@@ -195,19 +215,10 @@ namespace likhitan.Migrations
                     b.Property<int>("AuthorId")
                         .HasColumnType("int");
 
-                    b.Property<int>("BlogCategoryId")
+                    b.Property<int?>("BlogCategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("BlogCommentsId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("BlogLikesId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("BlogViewsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CategoryId")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
@@ -229,10 +240,10 @@ namespace likhitan.Migrations
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TagId")
+                    b.Property<int?>("TagId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TagsId")
+                    b.Property<int?>("TagsId")
                         .HasColumnType("int");
 
                     b.Property<string>("ThumbnailUrl")
@@ -251,15 +262,9 @@ namespace likhitan.Migrations
 
                     b.HasIndex("BlogCategoryId");
 
-                    b.HasIndex("BlogCommentsId");
-
-                    b.HasIndex("BlogLikesId");
-
-                    b.HasIndex("BlogViewsId");
-
                     b.HasIndex("TagsId");
 
-                    b.ToTable("Blogs", (string)null);
+                    b.ToTable("Blogs");
                 });
 
             modelBuilder.Entity("likhitan.Entities.Tags", b =>
@@ -270,7 +275,7 @@ namespace likhitan.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Deleted")
+                    b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("IsActive")
@@ -286,7 +291,7 @@ namespace likhitan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags", (string)null);
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("likhitan.Entities.User", b =>
@@ -298,15 +303,6 @@ namespace likhitan.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("AuthorId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("BlogCommentsId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("BlogLikesId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("BlogViewsId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Created")
@@ -367,15 +363,9 @@ namespace likhitan.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.HasIndex("BlogCommentsId");
-
-                    b.HasIndex("BlogLikesId");
-
-                    b.HasIndex("BlogViewsId");
-
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("likhitan.Entities.UserRoles", b =>
@@ -386,7 +376,13 @@ namespace likhitan.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -395,25 +391,28 @@ namespace likhitan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserRoles", (string)null);
+                    b.ToTable("UserRoles");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
                             IsActive = true,
+                            IsDeleted = false,
                             Name = "Standard"
                         },
                         new
                         {
                             Id = 2,
                             IsActive = true,
+                            IsDeleted = false,
                             Name = "Author"
                         },
                         new
                         {
                             Id = 3,
                             IsActive = true,
+                            IsDeleted = false,
                             Name = "Admin"
                         });
                 });
@@ -454,7 +453,64 @@ namespace likhitan.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserTracking", (string)null);
+                    b.ToTable("UserTracking");
+                });
+
+            modelBuilder.Entity("likhitan.Entities.BlogComments", b =>
+                {
+                    b.HasOne("likhitan.Entities.Blogs", "Blogs")
+                        .WithMany()
+                        .HasForeignKey("BlogsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("likhitan.Entities.User", "User")
+                        .WithMany("BlogComments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Blogs");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("likhitan.Entities.BlogLikes", b =>
+                {
+                    b.HasOne("likhitan.Entities.Blogs", "Blogs")
+                        .WithMany()
+                        .HasForeignKey("BlogsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("likhitan.Entities.User", "User")
+                        .WithMany("BlogLikes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Blogs");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("likhitan.Entities.BlogViews", b =>
+                {
+                    b.HasOne("likhitan.Entities.Blogs", "Blogs")
+                        .WithMany()
+                        .HasForeignKey("BlogsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("likhitan.Entities.User", "User")
+                        .WithMany("BlogViews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Blogs");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("likhitan.Entities.Blogs", b =>
@@ -467,27 +523,11 @@ namespace likhitan.Migrations
 
                     b.HasOne("likhitan.Entities.BlogCategory", "BlogCategory")
                         .WithMany()
-                        .HasForeignKey("BlogCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("likhitan.Entities.BlogComments", null)
-                        .WithMany("Blogs")
-                        .HasForeignKey("BlogCommentsId");
-
-                    b.HasOne("likhitan.Entities.BlogLikes", null)
-                        .WithMany("Blog")
-                        .HasForeignKey("BlogLikesId");
-
-                    b.HasOne("likhitan.Entities.BlogViews", null)
-                        .WithMany("Blogs")
-                        .HasForeignKey("BlogViewsId");
+                        .HasForeignKey("BlogCategoryId");
 
                     b.HasOne("likhitan.Entities.Tags", "Tags")
                         .WithMany("Blogs")
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TagsId");
 
                     b.Navigation("Author");
 
@@ -501,18 +541,6 @@ namespace likhitan.Migrations
                     b.HasOne("likhitan.Entities.Author", null)
                         .WithMany("User")
                         .HasForeignKey("AuthorId");
-
-                    b.HasOne("likhitan.Entities.BlogComments", null)
-                        .WithMany("User")
-                        .HasForeignKey("BlogCommentsId");
-
-                    b.HasOne("likhitan.Entities.BlogLikes", null)
-                        .WithMany("User")
-                        .HasForeignKey("BlogLikesId");
-
-                    b.HasOne("likhitan.Entities.BlogViews", null)
-                        .WithMany("User")
-                        .HasForeignKey("BlogViewsId");
 
                     b.HasOne("likhitan.Entities.UserRoles", "Role")
                         .WithMany("Users")
@@ -539,30 +567,18 @@ namespace likhitan.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("likhitan.Entities.BlogComments", b =>
-                {
-                    b.Navigation("Blogs");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("likhitan.Entities.BlogLikes", b =>
-                {
-                    b.Navigation("Blog");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("likhitan.Entities.BlogViews", b =>
-                {
-                    b.Navigation("Blogs");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("likhitan.Entities.Tags", b =>
                 {
                     b.Navigation("Blogs");
+                });
+
+            modelBuilder.Entity("likhitan.Entities.User", b =>
+                {
+                    b.Navigation("BlogComments");
+
+                    b.Navigation("BlogLikes");
+
+                    b.Navigation("BlogViews");
                 });
 
             modelBuilder.Entity("likhitan.Entities.UserRoles", b =>
