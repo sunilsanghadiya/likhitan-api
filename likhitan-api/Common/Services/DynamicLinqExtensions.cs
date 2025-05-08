@@ -197,6 +197,30 @@ namespace likhitan_api.Common.Services
                 (x, y) => resultSelector(x, y)
             );
         }
+
+        public static IEnumerable<TResult> GroupJoin<TOuter, TInner, TKey, TResult>(
+            this IEnumerable<TOuter> outer,
+            IEnumerable<TInner> inner,
+            Func<TOuter, TKey> outerKeySelector,
+            Func<TInner, TKey> innerKeySelector,
+            Func<TOuter, IEnumerable<TInner>, TResult> resultSelector,
+            IEqualityComparer<TKey> comparer)
+        {
+            if (outer == null) throw new ArgumentNullException(nameof(outer));
+            if (inner == null) throw new ArgumentNullException(nameof(inner));
+            if (outerKeySelector == null) throw new ArgumentNullException(nameof(outerKeySelector));
+            if (innerKeySelector == null) throw new ArgumentNullException(nameof(innerKeySelector));
+            if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
+
+            var lookup = inner.ToLookup(innerKeySelector, comparer);
+
+            foreach (var outerItem in outer)
+            {
+                var key = outerKeySelector(outerItem);
+                var innerItems = lookup[key];
+                yield return resultSelector(outerItem, innerItems);
+            }
+        }
     }
 
 }

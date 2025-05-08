@@ -1,5 +1,7 @@
-﻿using likhitan.Db;
+﻿using System.Linq.Expressions;
+using likhitan.Db;
 using likhitan.Entities;
+using likhitan_api.Common.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace likhitan.Repository
@@ -17,6 +19,7 @@ namespace likhitan.Repository
     }
     public class UserRepository : IUserRepository
     {
+
         public readonly ApplicationDbContext _context;
         public UserRepository(ApplicationDbContext context)
         {

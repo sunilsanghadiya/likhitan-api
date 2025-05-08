@@ -14,6 +14,9 @@ namespace likhitan_api.Models
         public int LikeCount { get; set; }
         public int CommentCount { get; set; }
         public int ViewCount { get; set; }
-        public List<BlogComments> Comments { get; set; } = [];
+        public List<BlogComments> BlogComments { get; set; } = [];
+        public List<BlogViews> BlogViews { get; set; } = [];
+        public List<BlogLikes> BlogLikes { get; set; } = [];
+        public DateTime? Published { get; set; }
     }
 }

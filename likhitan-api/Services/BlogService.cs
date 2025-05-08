@@ -44,10 +44,12 @@ namespace likhitan_api.Services
                 IsDeleted = false,
                 Created = DateTime.UtcNow,
                 AuthorId = writeBlogDto?.AuthorId ?? 0,
+                IsPublished = true,
+                Published = DateTime.UtcNow
             };
             await _blogRepository.SaveBlog(blog);
 
-            var writedBlog = await _blogRepository.IsBlogExists(blog.Id);
+            var writedBlog = _blogRepository.IsBlogExists(blog.Id);
 
             WriteBlogResponse writeBlogResponse = new()
             {
@@ -59,10 +61,8 @@ namespace likhitan_api.Services
 
         public async Task<Result<IEnumerable<BlogsResponse>>> GetBlogs(GetBlogsDto getBlogsDto)
         {
-            var loggedInUserDetails = _jwtHelperService.GetLoggedInUserDetails();
-
+            //var loggedInUserDetails = _jwtHelperService.GetLoggedInUserDetails();
             var blogs = _blogRepository.GetBlogs(getBlogsDto);
-
             return Result<IEnumerable<BlogsResponse>>.Success(blogs);
         }
     }

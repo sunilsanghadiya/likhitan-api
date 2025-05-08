@@ -21,5 +21,10 @@ namespace likhitan.Entities
         public Tags? Tags { get; set; } 
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
+        public virtual ICollection<BlogLikes> BlogLikes { get; set; } = [];
+        public virtual ICollection<BlogComments> BlogComments { get; set; } = [];
+        public virtual ICollection<BlogViews> BlogViews { get; set; } = [];
+        public DateTime? Published { get; set; }
+        public bool IsPublished { get; set; } = false;
     }
 }

@@ -1,6 +1,10 @@
 ﻿using System.Linq;
+using System.Linq.Expressions;
+using System.Xml.Linq;
 using likhitan.Db;
 using likhitan.Entities;
+using likhitan_api.Common.Repository;
+using likhitan_api.Common.Services;
 using likhitan_api.Models;
 using likhitan_api.Models.ClientDto;
 using Microsoft.EntityFrameworkCore;
@@ -12,12 +16,20 @@ namespace likhitan_api.Repository
         Task SaveBlog(Blogs blog);
         Task UpdateBlog(Blogs blog);
         Task<Blogs?> GetBlogById(int id);
-        Task<bool> IsBlogExists(int id);
+        bool IsBlogExists(int id);
         IQueryable<BlogsResponse> GetBlogs(GetBlogsDto getBlogsDto);
 
     }
-    public class BlogRepository : IBlogRepository
+    public class BlogRepository : BaseRepository<Blogs>, IBlogRepository
     {
+        protected override Expression<Func<Blogs, dynamic>>[] Includes =>
+        [
+            a => a.BlogCategory,
+            a => a.BlogViews,
+            a => a.BlogComments,
+            a => a.BlogLikes
+        ];
+
         private ApplicationDbContext _context;
 
         public BlogRepository(ApplicationDbContext context)
@@ -55,41 +67,31 @@ namespace likhitan_api.Repository
                 IsDeleted = d.IsDeleted
             }).FirstOrDefaultAsync();
 
-        public async Task<bool> IsBlogExists(int id) =>
-            await _context.Blogs.AsNoTracking().AnyAsync(a => a.Id == id);
+        public bool IsBlogExists(int id) =>
+             _context.Blogs.AsNoTracking().Any(a => a.Id == id);
 
         public IQueryable<BlogsResponse> GetBlogs(GetBlogsDto getBlogsDto)
         {
-            return _context.Author
-                .GroupJoin(_context.Blogs, a => a.Id, b => b.AuthorId, (a, blogs) => new { a, blogs })
-                .SelectMany(ab => ab.blogs.DefaultIfEmpty(), (ab, b) => new { ab.a, Blog = b })
-                .GroupJoin(_context.BlogLikes, ab => ab.Blog.Id, bl => bl.BlogId, (ab, likes) => new { ab.a, ab.Blog, likes })
-                .GroupJoin(_context.BlogComments, ab => ab.Blog.Id, bc => bc.BlogId, (ab, comments) => new { ab.a, ab.Blog, ab.likes, comments })
-                .GroupJoin(_context.BlogViews, ab => ab.Blog.Id, bv => bv.BlogId, (ab, views) => new { ab.a, ab.Blog, ab.likes, ab.comments, views })
-                .Select(result => new BlogsResponse
-                {
-                    AuthorId = result.a.Id,
-                    BlogId = result.Blog.Id,
-                    Content = result.Blog.Content,
-                    ThumbnailUrl = result.Blog.ThumbnailUrl,
-                    Title = result.Blog.Title,
-                    Slug = result.Blog.Slug,
-                    LikeCount = result.likes.Select(x => x.Id).Distinct().Count(),
-                    CommentCount = result.comments.Select(x => x.Id).Distinct().Count(),
-                    ViewCount = result.views.Select(x => x.Id).Distinct().Count(),
-                    Comments = result.comments
-                        .OrderByDescending(c => c.Created)
-                        .Take(10)
-                        .Select(c => new BlogComments
-                        {
-                            Id = c.Id,
-                            Comment = c.Comment,
-                            UserId = c.UserId,
-                            Created = c.Created
-                        }).ToList()
-                })
-                .Skip((getBlogsDto.PageNumber - 1) * getBlogsDto.PageSize)
-                .Take(getBlogsDto.PageSize);
+            return _context.Blogs
+                    .AsNoTracking()
+                    .OrderBy(b => b.Created)
+                    .Skip((getBlogsDto.PageNumber - 1) * getBlogsDto.PageSize)
+                    .Take(getBlogsDto.PageSize)
+                    .Select(b => new BlogsResponse
+                    {
+                        BlogId = b.Id,
+                        AuthorId = b.AuthorId,
+                        Published = b.Published,
+                        Title = b.Title,
+                        Content = b.Content,
+                        Slug = b.Slug,
+                        ThumbnailUrl = b.ThumbnailUrl,
+                        LikeCount = _context.BlogLikes.Where(lc => lc.BlogId == b.Id).Count(),
+                        CommentCount = _context.BlogComments.Where(bc => bc.BlogId == b.Id).Count(),
+                        ViewCount = _context.BlogViews.Where(bv => bv.BlogId == b.Id).Count(),
+                        BlogComments = _context.BlogComments.Where(c => c.BlogId == b.Id).ToList(),
+                    });
         }
     }
 }
+
