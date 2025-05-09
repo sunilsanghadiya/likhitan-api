@@ -184,6 +184,7 @@ namespace likhitan
             services.AddScoped<IUserTrackingRepository, UserTrackingRepository>();
             services.AddScoped<IAuthorRepository, AuthorRepository>();
             services.AddScoped<IBlogRepository, BlogRepository>();
+            services.AddScoped<IBlogCommentsRepository, BlogCommentsRepository>();
             #endregion
 
             #region Business Logic Services
@@ -194,6 +195,7 @@ namespace likhitan
             services.AddScoped<IUserTrackingService, UserTrackingService>();
             services.AddScoped<IAuthorService, AuthorService>();
             services.AddScoped<IBlogService, BlogService>();
+            services.AddScoped<IBlogCommentsService, BlogCommentsService>();
             #endregion
         }
 

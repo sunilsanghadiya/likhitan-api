@@ -27,5 +27,7 @@ namespace likhitan.Entities
         public virtual ICollection<BlogLikes> BlogLikes { get; set; } = [];
         public virtual ICollection<BlogComments> BlogComments { get; set; } = [];
         public virtual ICollection<BlogViews> BlogViews { get; set; } = [];
+        public string? ImageUrl { get; set; }
+        public string? ThumbnailUrl { get; set; }
     }
 }

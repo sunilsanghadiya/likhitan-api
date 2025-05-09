@@ -87,9 +87,9 @@ namespace likhitan_api.Repository
                         Slug = b.Slug,
                         ThumbnailUrl = b.ThumbnailUrl,
                         LikeCount = _context.BlogLikes.Where(lc => lc.BlogId == b.Id).Count(),
-                        CommentCount = _context.BlogComments.Where(bc => bc.BlogId == b.Id).Count(),
+                        CommentCount = _context.BlogComments.Where(bc => bc.BlogsId == b.Id).Count(),
                         ViewCount = _context.BlogViews.Where(bv => bv.BlogId == b.Id).Count(),
-                        BlogComments = _context.BlogComments.Where(c => c.BlogId == b.Id).ToList(),
+                        BlogComments = _context.BlogComments.Where(c => c.BlogsId == b.Id).ToList(),
                     });
         }
     }

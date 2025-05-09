@@ -27,5 +27,9 @@ namespace likhitan.Controllers
         [HttpPost("GetBlogs")]
         public async Task<Result<IEnumerable<BlogsResponse>>> GetBlogs(GetBlogsDto getBlogsDto) =>
             await _blogService.GetBlogs(getBlogsDto);
+
+        [HttpPost("BlogAction")]
+        public async Task<Result<BlogActionResponse>> BlogAction(BlogActionDto blogActionDto) =>
+            await _blogService.BlogAction(blogActionDto);
     }
 }

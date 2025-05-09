@@ -11,6 +11,7 @@
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
         public int AuthorId { get; set; }
-
+        public string? ThumbnailUrl { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

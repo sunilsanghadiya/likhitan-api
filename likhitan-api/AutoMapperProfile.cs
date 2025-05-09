@@ -3,6 +3,7 @@ using likhitan.Entities;
 using likhitan.Models;
 using likhitan.Models.ClientDto;
 using likhitan_api.Models;
+using likhitan_api.Models.ClientDto;
 
 namespace likhitan
 {
@@ -20,6 +21,7 @@ namespace likhitan
             CreateMap<Author, AuthorResponse>();
             CreateMap<User, WholeUserResponse>();
             CreateMap<WholeUserResponse, User>();
+            CreateMap<BlogCommentDto, BlogComments>();
         }
     }
 }

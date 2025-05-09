@@ -11,18 +11,25 @@ namespace likhitan_api.Services
     {
         Task<Result<WriteBlogResponse>> WriteBlog(WriteBlogDto writeBlogDto);
         Task<Result<IEnumerable<BlogsResponse>>> GetBlogs(GetBlogsDto getBlogsDto);
+        Task<Result<BlogActionResponse>> BlogAction(BlogActionDto blogActionDto);
     }
     public class BlogService : IBlogService
     {
         private readonly IBlogRepository _blogRepository;
         private readonly JwtHelperService _jwtHelperService;
         private IMapper _mapper;
+        private readonly IBlogCommentsService _blogCommentsService;
 
-        public BlogService(IBlogRepository blogRepository, JwtHelperService jwtHelperService, IMapper mapper)
+        public BlogService(
+            IBlogRepository blogRepository, 
+            JwtHelperService jwtHelperService, 
+            IMapper mapper, 
+            IBlogCommentsService blogCommentsService)
         {
             _blogRepository = blogRepository;
             _jwtHelperService = jwtHelperService;
             _mapper = mapper;
+            _blogCommentsService = blogCommentsService;
         }
 
         public async Task<Result<WriteBlogResponse>> WriteBlog(WriteBlogDto writeBlogDto)
@@ -61,9 +68,44 @@ namespace likhitan_api.Services
 
         public async Task<Result<IEnumerable<BlogsResponse>>> GetBlogs(GetBlogsDto getBlogsDto)
         {
-            //var loggedInUserDetails = _jwtHelperService.GetLoggedInUserDetails();
             var blogs = _blogRepository.GetBlogs(getBlogsDto);
             return Result<IEnumerable<BlogsResponse>>.Success(blogs);
+        }
+
+        public async Task<Result<BlogActionResponse>> BlogAction(BlogActionDto blogActionDto)
+        {
+            if(blogActionDto.ActionType < 0)
+            {
+                return Result<BlogActionResponse>.BadRequest("Please provide valid action type");
+            }
+
+            if (blogActionDto.ActionType == Common.Enums.BlogActionTypes.Comment)
+            {
+                var blogComments = new BlogCommentDto()
+                {
+                    Id = 0,
+                    BlogsId = blogActionDto.BlogId,
+                    Comment = blogActionDto?.Comment ?? "",
+                    UserId = blogActionDto.LoggedInUserId,
+                    ParentId = blogActionDto.ParentId,
+                    IsActive = true,
+                    IsDeleted = false,
+                    Created = DateTime.UtcNow
+                };
+                await _blogCommentsService.SaveBlogComment(blogComments);
+            }
+            else if (blogActionDto.ActionType == Common.Enums.BlogActionTypes.IsLiked)
+            {
+
+            }
+            else if(blogActionDto.ActionType == Common.Enums.BlogActionTypes.Saved)
+            {
+
+            }
+
+            var res = new BlogActionResponse() {  IsBlogActionPerformed = true };
+
+            return Result<BlogActionResponse>.Success(res);
         }
     }
 }
