@@ -13,6 +13,10 @@ namespace likhitan_api.Repository
 {
     public interface IBlogRepository
     {
+        #region SignalR Methods
+        
+        #endregion
+
         Task SaveBlog(Blogs blog);
         Task UpdateBlog(Blogs blog);
         Task<Blogs?> GetBlogById(int id);
